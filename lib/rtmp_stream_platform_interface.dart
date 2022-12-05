@@ -17,6 +17,14 @@ abstract class RtmpStreamPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  Future<void> enableTorch(Map<String, dynamic> params) {
+    throw UnimplementedError('enableTorch() has not been implemented.');
+  }
+
+  Future<void> disableTorch(Map<String, dynamic> params) {
+    throw UnimplementedError('disableTorch() has not been implemented.');
+  }
+
   /// Sets the audio decoding properties.
   Future<void> setAudioSettings(Map<String, dynamic> params) {
     throw UnimplementedError('setAudioSettings() has not been implemented.');

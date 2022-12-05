@@ -88,6 +88,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+bool test = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -96,7 +97,13 @@ class _MyAppState extends State<MyApp> {
           IconButton(
             icon: const Icon(Icons.play_arrow),
             onPressed: () {
-              if (_mode == "publish") {
+              if (!test) {
+              _stream?.enableTorch();
+              } else {
+              _stream?.disableTorch();
+              }
+              test = ! test;
+             /* if (_mode == "publish") {
                 _mode = "playback";
                 _stream?.attachVideo(null);
                 _stream?.attachAudio(null);
@@ -104,7 +111,7 @@ class _MyAppState extends State<MyApp> {
                 _mode = "publish";
                 _stream?.attachAudio(AudioSource());
                 _stream?.attachVideo(VideoSource(position: currentPosition));
-              }
+              }*/
             },
           ),
           IconButton(

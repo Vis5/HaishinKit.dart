@@ -8,16 +8,17 @@ import com.haishinkit.event.Event
 import com.haishinkit.event.IEventListener
 import com.haishinkit.media.AudioRecordSource
 import com.haishinkit.media.Camera2Source
+import com.haishinkit.media.Camera2SourceEventListener
 import com.haishinkit.rtmp.RtmpStream
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 class RtmpStreamHandler(
-    private val plugin: HaishinKitPlugin,
-    handler: RtmpConnectionHandler?
+        private val plugin: HaishinKitPlugin,
+        handler: RtmpConnectionHandler?
 ) : MethodChannel.MethodCallHandler, IEventListener,
-    EventChannel.StreamHandler {
+        EventChannel.StreamHandler {
     companion object {
         private const val TAG = "RtmpStream"
     }
@@ -25,21 +26,29 @@ class RtmpStreamHandler(
     var instance: RtmpStream? = null
     private var channel: EventChannel
     private var eventSink: EventChannel.EventSink? = null
-    private var camera = Camera2Source(plugin.flutterPluginBinding.applicationContext)
+    private var camera = Camera2Source(plugin.flutterPluginBinding.applicationContext)//, ::onException
 
     init {
         handler?.instance?.let {
             instance = RtmpStream(it)
         }
         channel = EventChannel(
-            plugin.flutterPluginBinding.binaryMessenger,
-            "com.haishinkit.eventchannel/${hashCode()}"
+                plugin.flutterPluginBinding.binaryMessenger,
+                "com.haishinkit.eventchannel/${hashCode()}"
         )
         channel.setStreamHandler(this)
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "RtmpStream#enableTorch" -> {
+                camera.enableTorch()
+                result.success(null)
+            }
+            "RtmpStream#disableTorch" -> {
+                camera.disableTorch()
+                result.success(null)
+            }
             "$TAG#setAudioSettings" -> {
                 val source = call.argument<Map<String, Any?>>("settings") ?: return
                 (source["bitrate"] as? Int)?.let {
@@ -110,7 +119,7 @@ class RtmpStreamHandler(
                     val width = call.argument<Double>("width") ?: 0
                     val height = call.argument<Double>("height") ?: 0
                     texture?.imageExtent =
-                        Size(width.toInt(), height.toInt())
+                            Size(width.toInt(), height.toInt())
                     (plugin.flutterPluginBinding.applicationContext.getSystemService(Context.WINDOW_SERVICE) as? WindowManager)?.defaultDisplay?.orientation?.let {
                         netStream.deviceOrientation = it
                     }
@@ -137,6 +146,17 @@ class RtmpStreamHandler(
         }
     }
 
+    fun onException(errorNumber: Int) {
+        val map = HashMap<String, Any?>()
+        map["type"] = "Error"
+        val data = HashMap<String, Any?>()
+        data["code"] = "Exception " + errorNumber
+        map["data"] = data
+        plugin.uiThreadHandler.post {
+            eventSink?.success(map)
+        }
+    }
+
     override fun handleEvent(event: Event) {
         val map = HashMap<String, Any?>()
         map["type"] = event.type
@@ -148,6 +168,13 @@ class RtmpStreamHandler(
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         eventSink = events
+
+        var cameraListener = Camera2SourceEventListener()
+        /*cameraListener.onException = { intParam ->
+            this.onException(intParam)
+        }*/
+        cameraListener.onException = ::onException
+        camera.setCameraEventListener(cameraListener)
     }
 
     override fun onCancel(arguments: Any?) {

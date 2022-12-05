@@ -5,6 +5,18 @@ import 'haishin_kit_method_channel.dart';
 /// The method channel implementation of [RtmpStreamPlatform]
 class MethodChannelRtmpStream extends RtmpStreamPlatform {
   @override
+  Future<void> enableTorch(Map<String, dynamic> params) async {
+    return await MethodChannelHaishinKit.channel
+        .invokeMethod<void>("RtmpStream#enableTorch", params);
+  }
+
+  @override
+  Future<void> disableTorch(Map<String, dynamic> params) async {
+    return await MethodChannelHaishinKit.channel
+        .invokeMethod<void>("RtmpStream#disableTorch", params);
+  }
+
+  @override
   Future<void> setAudioSettings(Map<String, dynamic> params) async {
     return await MethodChannelHaishinKit.channel
         .invokeMethod<void>("RtmpStream#setAudioSettings", params);

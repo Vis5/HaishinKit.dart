@@ -37,6 +37,18 @@ class RtmpStream extends NetStream {
   VideoSettings get videoSettings => _videoSettings;
 
   @override
+  Future<void> enableTorch() async {
+    assert(_memory != null);
+    RtmpStreamPlatform.instance.enableTorch({"memory": _memory});
+  }
+
+  @override
+  Future<void> disableTorch() async {
+    assert(_memory != null);
+    RtmpStreamPlatform.instance.disableTorch({"memory": _memory});
+  }
+
+  @override
   set videoSettings(VideoSettings videoSettings) {
     assert(_memory != null);
     _videoSettings = videoSettings;

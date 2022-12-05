@@ -9,6 +9,10 @@ import 'capture_settings.dart';
 abstract class NetStream {
   /// The memory address.
   int? get memory;
+  
+  Future<void> enableTorch();
+  
+  Future<void> disableTorch();
 
   /// Specifies stream video compression properties.
   set videoSettings(VideoSettings videoSettings);

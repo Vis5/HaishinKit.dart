@@ -36,6 +36,10 @@ class RTMPStreamHandler: NSObject, MethodCallHandler {
             return
         }
         switch call.method {
+        case "RtmpStream#enableTorch":
+            result(nil)
+        case "RtmpStream#disableTorch":
+            result(nil)
         case "RtmpStream#setAudioSettings":
             guard
                 let settings = arguments["settings"] as? [String: Any?] else {
